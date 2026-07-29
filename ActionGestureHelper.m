@@ -79,6 +79,7 @@ typedef void (*AGButtonEventIMP)(SBRingerHardwareButton *,
                                                    resolvedDirection
                                                  synchronize:(BOOL)synchronize;
 - (void)reloadDirectionMode;
+- (NSTimeInterval)fallbackReloadDelay;
 - (BOOL)applyConfiguration:(AGGestureConfiguration *)configuration;
 - (nullable NSString *)finishDirectionSampling;
 - (nullable NSString *)directionForGravity:(CMAcceleration)gravity;
@@ -205,6 +206,15 @@ typedef void (*AGButtonEventIMP)(SBRingerHardwareButton *,
     notify_post("com.huami.actiongesture.direction-mode-changed");
 }
 
+- (NSTimeInterval)fallbackReloadDelay {
+    CFPreferencesAppSynchronize(CFSTR("com.huami.actiongesture"));
+    id value = [self preferenceValueForKey:@"fallbackReloadDelayMs"];
+    double milliseconds =
+        [value isKindOfClass:NSNumber.class] ? [value doubleValue] : 80.0;
+    if (milliseconds < 0) milliseconds = 0;
+    if (milliseconds > 500) milliseconds = 500;
+    return milliseconds / 1000.0;
+}
 - (AGGestureConfiguration *)configurationForGesture:(NSString *)gesture
                                            direction:(NSString *)direction
                                          synchronize:(BOOL)synchronize {
@@ -943,8 +953,23 @@ typedef void (*AGButtonEventIMP)(SBRingerHardwareButton *,
              assignmentIdentifier:assignmentIdentifier
                          onButton:button];
     if (!selected) {
-        [self applyConfiguration:configuration];
-        selected = [self reloadSelectedActionOnButton:button];
+        BOOL applied = [self applyConfiguration:configuration];
+        if (applied) {
+            NSTimeInterval delay = [self fallbackReloadDelay];
+            __weak SBRingerHardwareButton *weakButton = button;
+            __weak ActionGestureHelper *weakSelf = self;
+            dispatch_after(
+                dispatch_time(DISPATCH_TIME_NOW,
+                              (int64_t)(delay * NSEC_PER_SEC)),
+                dispatch_get_main_queue(), ^{
+                    ActionGestureHelper *strongSelf = weakSelf;
+                    SBRingerHardwareButton *strongButton = weakButton;
+                    if (strongSelf && strongButton) {
+                        [strongSelf reloadSelectedActionOnButton:strongButton];
+                    }
+                });
+        }
+        selected = applied;
     }
     return selected && [self replayNativeActionOnButton:button event:event];
 }

@@ -32,9 +32,9 @@ Running `releases.sh` creates three packages in `packages/`:
 
 | File | Jailbreak environment |
 | --- | --- |
-| `ActionGesture_0.0-2-arm.deb` | rootful |
-| `ActionGesture_0.0-2-arm64.deb` | rootless |
-| `ActionGesture_0.0-2-arm64e.deb` | RootHide |
+| `ActionGesture_0.0-3-arm.deb` | rootful |
+| `ActionGesture_0.0-3-arm64.deb` | rootless |
+| `ActionGesture_0.0-3-arm64e.deb` | RootHide |
 
 Requires an iPhone with an Action Button running iOS 17 or later.
 

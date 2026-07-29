@@ -34,9 +34,9 @@
 
 | 文件 | 越狱环境 |
 | --- | --- |
-| `ActionGesture_0.0-2-arm.deb` | rootful |
-| `ActionGesture_0.0-2-arm64.deb` | rootless |
-| `ActionGesture_0.0-2-arm64e.deb` | RootHide |
+| `ActionGesture_0.0-3-arm.deb` | rootful |
+| `ActionGesture_0.0-3-arm64.deb` | rootless |
+| `ActionGesture_0.0-3-arm64e.deb` | RootHide |
 
 需要一台带操作按钮的 iPhone，系统版本为 iOS 17 或更高。
 
